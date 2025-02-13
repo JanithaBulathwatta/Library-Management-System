@@ -58,4 +58,12 @@ public class BookService {
             return null;
         }
     }
+    public String deleteBook(int id) {
+        if(bookRepo.existsById(id)){
+            bookRepo.deleteById(id);
+            return VarList.RSP_SUCCESS;
+        }
+        return VarList.RSP_NO_DATA_FOUND;
+
+    }
 }
