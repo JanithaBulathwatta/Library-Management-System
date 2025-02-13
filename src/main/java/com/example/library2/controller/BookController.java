@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/books")
 public class BookController {
@@ -58,6 +60,92 @@ public class BookController {
         }
 
     }
+
+    @PutMapping(value = "/updateBook")
+    public ResponseEntity updateBook(@RequestBody BookDTO bookDTO) {
+
+
+        try{
+            String res = bookService.UpdateBook(bookDTO);
+            if(res.equals("00")){
+                responseDTO.setCode(VarList.RSP_SUCCESS);
+                responseDTO.setMessage("Success");
+                responseDTO.setContent(bookDTO);
+                return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
+
+            } else if (res.equals("01")) {
+                responseDTO.setCode(VarList.RSP_DUPLICATE);
+                responseDTO.setMessage("this book not available");
+                responseDTO.setContent(bookDTO);
+                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
+
+
+            }else{
+
+                responseDTO.setCode(VarList.RSP_FAIL);
+                responseDTO.setMessage("Error");
+                responseDTO.setContent(null);
+                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
+
+
+            }
+
+        }catch(Exception e){
+            responseDTO.setCode(VarList.RSP_ERROR);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setContent(null);
+            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+
+    }
+
+    @GetMapping("/getAllBooks")
+    public ResponseEntity getAllBooks() {
+        try {
+            List<BookDTO> list = bookService.getAllBooks();
+            responseDTO.setCode(VarList.RSP_SUCCESS);
+            responseDTO.setMessage("Success");
+            responseDTO.setContent(list);
+            return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
+
+        }catch (Exception e){
+            responseDTO.setCode(VarList.RSP_ERROR);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setContent(null);
+            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @GetMapping("/searchBook/{id}")
+    public ResponseEntity searchBook(@PathVariable int id) {
+        try {
+            BookDTO bookDTO = bookService.searchBook(id);
+            if (bookDTO != null) {
+                responseDTO.setCode(VarList.RSP_SUCCESS);
+                responseDTO.setMessage("Success");
+                responseDTO.setContent(bookDTO);
+                return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
+            }else{
+                responseDTO.setCode(VarList.RSP_NO_DATA_FOUND);
+                responseDTO.setMessage("No Employee available for this empID");
+                responseDTO.setContent(null);
+                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
+            }
+
+        }catch (Exception ex){
+            responseDTO.setCode(VarList.RSP_ERROR);
+            responseDTO.setMessage(ex.getMessage());
+            responseDTO.setContent(null);
+            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
+
+
 
 
 }
